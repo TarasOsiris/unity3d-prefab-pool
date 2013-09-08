@@ -1,0 +1,14 @@
+# Ignore The following directories / file extensions
+Library
+Temp
+_ReSharper.Simple Prefab Pool-csharp
+obj
+
+# Ignore the following file extensions
+*.exe
+*.vcproject
+*.sln
+*.suo
+*.user
+*.pidb
+*.userprefs
