@@ -10,8 +10,10 @@ public class TestMyPool : MonoBehaviour
         int growth = 5; // number of new prefabs instantiated when the pool grows in size
         int maxPoolSize = int.MaxValue;
 
+        Transform parent = GameObject.FindGameObjectWithTag("PoolHolder").transform;
+
         // Create pool of cubes containing instantiated cubePrefabs
-        PrefabPool cubesPool = new PrefabPool(cubePrefab, initialPoolSize, growth, maxPoolSize);
+        PrefabPool cubesPool = new PrefabPool(cubePrefab, parent, initialPoolSize, growth, maxPoolSize);
 
         // position, rotation and scale for prefab obtained from the pool
         Vector3 pos = new Vector3(2, 2, 2);

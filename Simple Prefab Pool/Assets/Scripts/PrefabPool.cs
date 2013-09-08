@@ -9,6 +9,9 @@ public class PrefabPool : IPrefabPool
     // ===========================================
     private readonly List<Transform> _availablePrefabs;
     private readonly Transform _prefab;
+
+    // parent Transform for instantiated items 
+    private readonly Transform _parent; 
     private readonly int _growth;
 
     // ===========================================
@@ -26,22 +29,22 @@ public class PrefabPool : IPrefabPool
     // ===========================================
     // Constructors
     // ===========================================
-    public PrefabPool(Transform prefab)
-        : this(prefab, 0)
+    public PrefabPool(Transform prefab, Transform parent)
+        : this(prefab, parent, 0)
     {
     }
 
-    public PrefabPool(Transform prefab, int initialSize)
-        : this(prefab, initialSize, 1)
+    public PrefabPool(Transform prefab, Transform parent, int initialSize)
+        : this(prefab, parent, initialSize, 1)
     {
     }
 
-    public PrefabPool(Transform prefab, int initialSize, int growth)
-        : this(prefab, initialSize, growth, int.MaxValue)
+    public PrefabPool(Transform prefab, Transform parent, int initialSize, int growth)
+        : this(prefab, parent, initialSize, growth, int.MaxValue)
     {
     }
 
-    public PrefabPool(Transform prefab, int initialSize, int growth, int availableItemsMaximum)
+    public PrefabPool(Transform prefab, Transform parent, int initialSize, int growth, int availableItemsMaximum)
     {
         if (growth <= 0)
         {
@@ -53,6 +56,7 @@ public class PrefabPool : IPrefabPool
         }
 
         _prefab = prefab;
+        _parent = parent;
         _growth = growth;
         AvailablePrefabCountMaximum = availableItemsMaximum;
         _availablePrefabs = new List<Transform>(initialSize);
@@ -114,6 +118,7 @@ public class PrefabPool : IPrefabPool
     {
         Transform instance = GameObject.Instantiate(_prefab, Vector3.zero, Quaternion.identity) as Transform;
         instance.gameObject.SetActive(false);
+        instance.parent = _parent;
         return instance;
     }
 
