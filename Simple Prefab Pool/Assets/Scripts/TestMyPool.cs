@@ -3,6 +3,9 @@
 public class TestMyPool : MonoBehaviour
 {
     public Transform cubePrefab;
+
+    public Transform newParent;
+
     public int initialPoolSize = 15; // number of prefabs that will be instantiated when pool is created
     public int growth = 5; // number of new prefabs instantiated when the pool grows in size
     public int maxPoolSize = int.MaxValue;
@@ -26,7 +29,7 @@ public class TestMyPool : MonoBehaviour
         for (int i = 0; i < myCubes.Length; i++)
         {
             // obtained item becomes active the moment you retrieve it
-            myCubes[i] = cubesPool.ObtainPrefabInstance(pos * i, rotation, scale); 
+            myCubes[i] = cubesPool.ObtainPrefabInstance(newParent.gameObject); 
         }
 
         const int numberOfCubesToRecycle = 3;

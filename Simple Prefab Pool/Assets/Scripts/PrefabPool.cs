@@ -70,16 +70,7 @@ public class PrefabPool : IPrefabPool
     // ===========================================
     // Public Methods
     // ===========================================
-    public Transform ObtainPrefabInstance(Vector3 position, Quaternion rotation, Vector3 scale)
-    {
-        Transform obtainedPrefab = ObtainPoolItem();
-
-        obtainedPrefab.position = position;
-        obtainedPrefab.rotation = rotation;
-        obtainedPrefab.localScale = scale;
-
-        return obtainedPrefab;
-    }
+    public Transform ObtainPrefabInstance(GameObject newParent) { return ObtainPoolItem(newParent); }
 
     public void RecyclePrefabInstance(Transform prefab)
     {
@@ -122,19 +113,24 @@ public class PrefabPool : IPrefabPool
         return instance;
     }
 
-    private void OnHandleObtainPrefab(Transform prefab)
+    private void OnHandleObtainPrefab(Transform prefabInstance, GameObject parent)
     {
-        prefab.gameObject.SetActive(true);
+        PrefabPoolUtils.AddChild(parent, prefabInstance.gameObject);
+        prefabInstance.gameObject.SetActive(true);
     }
 
     /*
      * Every item passes this method before it gets recycled
      */
-    private void OnHandleRecyclePrefab(Transform prefab)
+    private void OnHandleRecyclePrefab(Transform prefabInstance)
     {
-        prefab.gameObject.SetActive(false);
-        prefab.position = Vector3.zero;
-        prefab.rotation = Quaternion.identity;
+        prefabInstance.parent = _parent;
+        prefabInstance.position = Vector3.zero;
+        prefabInstance.rotation = Quaternion.identity;
+        prefabInstance.localScale = Vector3.one;
+        prefabInstance.gameObject.layer = _parent.gameObject.layer;
+
+        prefabInstance.gameObject.SetActive(false);
     }
 
     private void BatchAllocatePoolItems(int count)
@@ -153,35 +149,35 @@ public class PrefabPool : IPrefabPool
         }
     }
 
-    private Transform ObtainPoolItem()
+    private Transform ObtainPoolItem(GameObject newParent)
     {
-        Transform prefab;
+        Transform prefabInstance;
 
         if (_availablePrefabs.Count > 0)
         {
-            prefab = RetrieveLastItemAndRemoveIt();
+            prefabInstance = RetrieveLastItemAndRemoveIt();
         }
         else
         {
             if (_growth == 1 || AvailablePrefabCountMaximum == 0)
             {
-                prefab = OnHandleAllocatePoolItem();
+                prefabInstance = OnHandleAllocatePoolItem();
             }
             else
             {
                 BatchAllocatePoolItems(_growth);
-                prefab = RetrieveLastItemAndRemoveIt();
+                prefabInstance = RetrieveLastItemAndRemoveIt();
             }
 
-            Debug.Log(GetType().FullName + "<" + prefab.GetType().Name + "> was exhausted, with " + UnrecycledPrefabCount +
+            Debug.Log(GetType().FullName + "<" + prefabInstance.GetType().Name + "> was exhausted, with " + UnrecycledPrefabCount +
                       " items not yet recycled.  " +
                       "Allocated " + _growth + " more.");
         }
 
-        OnHandleObtainPrefab(prefab);
+        OnHandleObtainPrefab(prefabInstance, newParent);
         UnrecycledPrefabCount++;
 
-        return prefab;
+        return prefabInstance;
     }
 
     private Transform RetrieveLastItemAndRemoveIt()
