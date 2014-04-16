@@ -70,7 +70,7 @@ public class PrefabPool : IPrefabPool
     // ===========================================
     // Public Methods
     // ===========================================
-    public Transform ObtainPrefab(Vector3 position, Quaternion rotation, Vector3 scale)
+    public Transform ObtainPrefabInstance(Vector3 position, Quaternion rotation, Vector3 scale)
     {
         Transform obtainedPrefab = ObtainPoolItem();
 
@@ -81,7 +81,7 @@ public class PrefabPool : IPrefabPool
         return obtainedPrefab;
     }
 
-    public void RecyclePrefab(Transform prefab)
+    public void RecyclePrefabInstance(Transform prefab)
     {
         if (prefab == null)
         {
@@ -116,7 +116,7 @@ public class PrefabPool : IPrefabPool
      */
     private Transform OnAllocatePoolItem()
     {
-        Transform instance = GameObject.Instantiate(_prefab, Vector3.zero, Quaternion.identity) as Transform;
+        var instance = GameObject.Instantiate(_prefab, Vector3.zero, Quaternion.identity) as Transform;
         instance.gameObject.SetActive(false);
         instance.parent = _parent;
         return instance;

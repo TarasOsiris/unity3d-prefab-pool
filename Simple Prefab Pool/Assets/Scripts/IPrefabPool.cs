@@ -8,7 +8,7 @@ public interface IPrefabPool
 
     int AvailablePrefabCountMaximum { get; }
 
-    Transform ObtainPrefab(Vector3 position, Quaternion rotation, Vector3 scale);
+    Transform ObtainPrefabInstance(Vector3 position, Quaternion rotation, Vector3 scale);
 
-    void RecyclePrefab(Transform prefab);
+    void RecyclePrefabInstance(Transform prefab);
 }
