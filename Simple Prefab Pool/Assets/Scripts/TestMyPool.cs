@@ -17,11 +17,6 @@ public class TestMyPool : MonoBehaviour
         // Create pool of cubes containing instantiated cubePrefabs
         var cubesPool = new PrefabPool(cubePrefab, parent, initialPoolSize, growth, maxPoolSize);
 
-        // position, rotation and scale for prefab obtained from the pool
-        var pos = new Vector3(2, 2, 2);
-        var rotation = Quaternion.Euler(45.0f, 45.0f, 45.0f);
-        var scale = new Vector3(2, 2, 2);
-
         // Obtain already instantiated pool items.
         const int numberOfCubesRequired = 5;
         var myCubes = new Transform[numberOfCubesRequired];
