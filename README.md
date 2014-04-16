@@ -23,12 +23,7 @@ Now the only methods you should care about are `ObtainPrefab` and `RecyclePrefab
 ### Obtaining instantiated prefab from the pool
 
 ```csharp
-// position, rotation and scale for prefab obtained from the pool
-Vector3 pos = new Vector3(2, 2, 2);
-Quaternion rotation = Quaternion.Euler(45.0f, 45.0f, 45.0f);
-Vector3 scale = new Vector3(2, 2, 2);
- 
-Transform retrievedCubeInstance1 = cubesPool.ObtainPrefab(pos, rotation, scale);
+Transform retrievedCubeInstance1 = cubesPool.ObtainPrefabInstance(newParent.gameObject); 
 ```
 ### Recycling active instantiated prefab
 ```csharp
