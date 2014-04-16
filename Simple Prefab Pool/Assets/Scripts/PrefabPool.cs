@@ -124,11 +124,7 @@ public class PrefabPool : IPrefabPool
      */
     private void OnHandleRecyclePrefab(Transform prefabInstance)
     {
-        prefabInstance.parent = _parent;
-        prefabInstance.position = Vector3.zero;
-        prefabInstance.rotation = Quaternion.identity;
-        prefabInstance.localScale = Vector3.one;
-        prefabInstance.gameObject.layer = _parent.gameObject.layer;
+        PrefabPoolUtils.AddChild(_parent.gameObject, prefabInstance.gameObject);
 
         prefabInstance.gameObject.SetActive(false);
     }
