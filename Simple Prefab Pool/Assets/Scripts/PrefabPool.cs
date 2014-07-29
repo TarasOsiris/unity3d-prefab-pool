@@ -10,8 +10,8 @@ public class PrefabPool : IPrefabPool
     private readonly List<Transform> _availablePrefabs;
     private readonly Transform _prefab;
 
-    // parent Transform for instantiated items 
-    private readonly Transform _parent; 
+    // parent Transform for instantiated items
+    private readonly Transform _parent;
     private readonly int _growth;
 
     // ===========================================
@@ -70,7 +70,13 @@ public class PrefabPool : IPrefabPool
     // ===========================================
     // Public Methods
     // ===========================================
-    public Transform ObtainPrefabInstance(GameObject newParent) { return ObtainPoolItem(newParent); }
+
+    #region API
+
+    public Transform ObtainPrefabInstance(GameObject newParent)
+    {
+        return ObtainPoolItem(newParent);
+    }
 
     public void RecyclePrefabInstance(Transform prefab)
     {
@@ -93,6 +99,8 @@ public class PrefabPool : IPrefabPool
             Debug.Log("More items recycled than obtained");
         }
     }
+
+    #endregion
 
     // ===========================================
     // Private Methods
@@ -166,8 +174,8 @@ public class PrefabPool : IPrefabPool
             }
 
             Debug.Log(GetType().FullName + "<" + prefabInstance.GetType().Name + "> was exhausted, with " + UnrecycledPrefabCount +
-                      " items not yet recycled.  " +
-                      "Allocated " + _growth + " more.");
+            " items not yet recycled.  " +
+            "Allocated " + _growth + " more.");
         }
 
         OnHandleObtainPrefab(prefabInstance, newParent);
