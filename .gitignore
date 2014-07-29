@@ -1,14 +1,41 @@
-# Ignore The following directories / file extensions
-Library
-Temp
 _ReSharper.Simple Prefab Pool-csharp
-obj
 
-# Ignore the following file extensions
-*.exe
-*.vcproject
-*.sln
-*.suo
-*.user
-*.pidb
+# =============== #
+# Unity generated #
+# =============== #
+Temp/
+obj/
+Library/
+ 
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+ExportedObj/
+*.svd
 *.userprefs
+*.csproj
+*.pidb
+*.suo
+*.sln
+*.user
+*.unityproj
+*.booproj
+ 
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+ 
+# ======================== #
+# Assembly generated files #
+# ======================== #
+Assembly-CSharp-Editor-vs.csproj
+Assembly-CSharp-vs.csproj
+Assembly-CSharp.csproj
+Assembly-CSharp-Editor.csproj
