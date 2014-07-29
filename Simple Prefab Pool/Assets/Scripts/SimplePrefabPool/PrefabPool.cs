@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SimplePrefabPool
 {
 	public class PrefabPool : IPrefabPool
 	{
-	    private readonly List<GameObject> _availablePrefabs;
+	    private readonly List<GameObject> _availableInstances;
 	    private readonly GameObject _prefab;
 	
 	    // parent GameObject for instantiated items
@@ -17,7 +18,7 @@ namespace SimplePrefabPool
 	
 	    public int AvailablePrefabCount
 	    {
-	        get { return _availablePrefabs.Count; }
+	        get { return _availableInstances.Count; }
 	    }
 	
 	    public int AvailablePrefabCountMaximum { get; private set; }
@@ -53,7 +54,7 @@ namespace SimplePrefabPool
 	        _parent = parent;
 	        _growth = growth;
 	        AvailablePrefabCountMaximum = availableItemsMaximum;
-	        _availablePrefabs = new List<GameObject>(initialSize);
+	        _availableInstances = new List<GameObject>(initialSize);
 	
 	        if (initialSize > 0)
 	        {
@@ -62,46 +63,57 @@ namespace SimplePrefabPool
 	    }
         #endregion
 
-        // ===========================================
-	    // Public Methods
-	    // ===========================================
-	
-	    #region API
-	
 	    public GameObject ObtainPrefabInstance()
 	    {
-	        return ObtainPoolItem();
+            GameObject prefabInstance;
+
+            if (_availableInstances.Count > 0)
+            {
+                prefabInstance = RetrieveLastItemAndRemoveIt();
+            }
+            else
+            {
+                if (_growth == 1 || AvailablePrefabCountMaximum == 0)
+                {
+                    prefabInstance = AllocatePoolItem();
+                }
+                else
+                {
+                    BatchAllocatePoolItems(_growth);
+                    prefabInstance = RetrieveLastItemAndRemoveIt();
+                }
+
+                Debug.Log(GetType().FullName + "<" + prefabInstance.GetType().Name + "> was exhausted, with " + UnrecycledPrefabCount +
+                " items not yet recycled.  " +
+                "Allocated " + _growth + " more.");
+            }
+
+            OnHandleObtainPrefab(prefabInstance);
+            UnrecycledPrefabCount++;
+
+            return prefabInstance;
 	    }
+
+        /*
+         * Every item passes this method before it is obtained from the pool
+         */
+        private void OnHandleObtainPrefab(GameObject prefabInstance)
+        {
+            prefabInstance.gameObject.SetActive(true);
+        }
 	
 	    public void RecyclePrefabInstance(GameObject prefab)
 	    {
 	        if (prefab == null) { throw new ArgumentNullException("Cannot recycle null item!"); }
 	
 	        OnHandleRecyclePrefab(prefab);
-	        if (_availablePrefabs.Count < AvailablePrefabCountMaximum) { _availablePrefabs.Add(prefab); }
+
+	        if (_availableInstances.Count < AvailablePrefabCountMaximum) { _availableInstances.Add(prefab); }
 	        UnrecycledPrefabCount--;
 	
 	        if (UnrecycledPrefabCount < 0) { Debug.Log("More items recycled than obtained"); }
 	    }
-	
-	    #endregion
-	
-	    /*
-	     * Every cubePrefab that was just obtained from the pool, passes this method
-	     */
-	    private GameObject OnAllocatePoolItem()
-	    {
-	        var instance = GameObject.Instantiate(_prefab, Vector3.zero, Quaternion.identity) as GameObject;
-	        instance.gameObject.SetActive(false);
-	        instance.transform.parent = _parent.transform;
-	        return instance;
-	    }
-	
-	    private void OnHandleObtainPrefab(GameObject prefabInstance)
-	    {
-	        prefabInstance.gameObject.SetActive(true);
-	    }
-	
+
 	    /*
 	     * Every item passes this method before it gets recycled
 	     */
@@ -110,10 +122,19 @@ namespace SimplePrefabPool
 	        PrefabPoolUtils.AddChild(_parent.gameObject, prefabInstance.gameObject);
 	        prefabInstance.gameObject.SetActive(false);
 	    }
-	
+
+	    private GameObject AllocatePoolItem()
+	    {
+	        var instance = Object.Instantiate(_prefab, Vector3.zero, Quaternion.identity) as GameObject;
+	        instance.gameObject.SetActive(false);
+	        instance.transform.parent = _parent.transform;
+	        return instance;
+	    }
+
+	    #region herlper_methods
 	    private void BatchAllocatePoolItems(int count)
 	    {
-	        List<GameObject> availableItems = _availablePrefabs;
+	        List<GameObject> availableItems = _availableInstances;
 	
 	        int allocationCount = AvailablePrefabCountMaximum - availableItems.Count;
 	        if (count < allocationCount)
@@ -123,48 +144,18 @@ namespace SimplePrefabPool
 	
 	        for (int i = allocationCount - 1; i >= 0; i--)
 	        {
-	            availableItems.Add(OnAllocatePoolItem());
+	            availableItems.Add(AllocatePoolItem());
 	        }
 	    }
-	
-	    private GameObject ObtainPoolItem()
-	    {
-	        GameObject prefabInstance;
-	
-	        if (_availablePrefabs.Count > 0)
-	        {
-	            prefabInstance = RetrieveLastItemAndRemoveIt();
-	        }
-	        else
-	        {
-	            if (_growth == 1 || AvailablePrefabCountMaximum == 0)
-	            {
-	                prefabInstance = OnAllocatePoolItem();
-	            }
-	            else
-	            {
-	                BatchAllocatePoolItems(_growth);
-	                prefabInstance = RetrieveLastItemAndRemoveIt();
-	            }
-	
-	            Debug.Log(GetType().FullName + "<" + prefabInstance.GetType().Name + "> was exhausted, with " + UnrecycledPrefabCount +
-	            " items not yet recycled.  " +
-	            "Allocated " + _growth + " more.");
-	        }
-	
-	        OnHandleObtainPrefab(prefabInstance);
-	        UnrecycledPrefabCount++;
-	
-	        return prefabInstance;
-	    }
-	
+
 	    private GameObject RetrieveLastItemAndRemoveIt()
 	    {
-	        int lastElementIndex = _availablePrefabs.Count - 1;
-	        var prefab = _availablePrefabs[lastElementIndex];
-	        _availablePrefabs.RemoveAt(lastElementIndex);
+	        int lastElementIndex = _availableInstances.Count - 1;
+	        var prefab = _availableInstances[lastElementIndex];
+	        _availableInstances.RemoveAt(lastElementIndex);
 	
 	        return prefab;
-	    }
-	}
+        }
+        #endregion
+    }
 }
