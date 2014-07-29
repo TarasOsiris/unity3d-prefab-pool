@@ -5,10 +5,10 @@ using Object = UnityEngine.Object;
 
 namespace SimplePrefabPool
 {
-	public class PrefabPool : IPrefabPool
+	public abstract class AbstractPrefabPool<T> : IPrefabPool<T> where T : Object
 	{
-	    private readonly List<GameObject> _availableInstances;
-	    private readonly GameObject _prefab;
+	    private readonly List<T> _availableInstances;
+	    private readonly T _objectToCopy;
 	
 	    // parent GameObject for instantiated items
 	    private readonly GameObject _parent;
@@ -24,22 +24,23 @@ namespace SimplePrefabPool
 	    public int AvailablePrefabCountMaximum { get; private set; }
 
         #region constructors
-        public PrefabPool(GameObject prefab, GameObject parent)
-	        : this(prefab, parent, 0)
+
+	    protected AbstractPrefabPool(T objectToCopy, GameObject parent)
+	        : this(objectToCopy, parent, 0)
 	    {
 	    }
-	
-	    public PrefabPool(GameObject prefab, GameObject parent, int initialSize)
-	        : this(prefab, parent, initialSize, 1)
+
+	    protected AbstractPrefabPool(T objectToCopy, GameObject parent, int initialSize)
+	        : this(objectToCopy, parent, initialSize, 1)
 	    {
 	    }
-	
-	    public PrefabPool(GameObject prefab, GameObject parent, int initialSize, int growth)
-	        : this(prefab, parent, initialSize, growth, int.MaxValue)
+
+	    protected AbstractPrefabPool(T objectToCopy, GameObject parent, int initialSize, int growth)
+	        : this(objectToCopy, parent, initialSize, growth, int.MaxValue)
 	    {
 	    }
-	
-	    public PrefabPool(GameObject prefab, GameObject parent, int initialSize, int growth, int availableItemsMaximum)
+
+	    protected AbstractPrefabPool(T objectToCopy, GameObject parent, int initialSize, int growth, int availableItemsMaximum)
 	    {
 	        if (growth <= 0)
 	        {
@@ -50,11 +51,11 @@ namespace SimplePrefabPool
 	            throw new ArgumentOutOfRangeException("availableItemsMaximum must be at least 0!");
 	        }
 	
-	        _prefab = prefab;
+	        _objectToCopy = objectToCopy;
 	        _parent = parent;
 	        _growth = growth;
 	        AvailablePrefabCountMaximum = availableItemsMaximum;
-	        _availableInstances = new List<GameObject>(initialSize);
+	        _availableInstances = new List<T>(initialSize);
 	
 	        if (initialSize > 0)
 	        {
@@ -63,9 +64,27 @@ namespace SimplePrefabPool
 	    }
         #endregion
 
-	    public GameObject ObtainPrefabInstance()
+        #region abstract_members
+        /*
+	     * Every item passes this method before it gets recycled
+	     */
+        protected abstract void OnHandleAllocatePrefab(T prefabInstance);
+
+        /*
+         * Every item passes this method before it is obtained from the pool
+         */
+        protected abstract void OnHandleObtainPrefab(T prefabInstance);
+
+	    /*
+	     * Every item passes this method before it gets recycled
+	     */
+	    protected abstract void OnHandleRecyclePrefab(T prefabInstance);
+
+	    #endregion
+
+	    public T ObtainPrefabInstance()
 	    {
-            GameObject prefabInstance;
+            T prefabInstance;
 
             if (_availableInstances.Count > 0)
             {
@@ -94,15 +113,10 @@ namespace SimplePrefabPool
             return prefabInstance;
 	    }
 
-        /*
-         * Every item passes this method before it is obtained from the pool
-         */
-        protected virtual void OnHandleObtainPrefab(GameObject prefabInstance)
-        {
-            prefabInstance.gameObject.SetActive(true);
-        }
-	
-	    public void RecyclePrefabInstance(GameObject prefab)
+
+
+
+	    public void RecyclePrefabInstance(T prefab)
 	    {
 	        if (prefab == null) { throw new ArgumentNullException("Cannot recycle null item!"); }
 	
@@ -114,27 +128,17 @@ namespace SimplePrefabPool
 	        if (UnrecycledPrefabCount < 0) { Debug.Log("More items recycled than obtained"); }
 	    }
 
-	    /*
-	     * Every item passes this method before it gets recycled
-	     */
-	    protected virtual void OnHandleRecyclePrefab(GameObject prefabInstance)
+	    private T AllocatePoolItem()
 	    {
-	        PrefabPoolUtils.AddChild(_parent.gameObject, prefabInstance.gameObject);
-	        prefabInstance.gameObject.SetActive(false);
-	    }
-
-	    private GameObject AllocatePoolItem()
-	    {
-	        var instance = Object.Instantiate(_prefab, Vector3.zero, Quaternion.identity) as GameObject;
-	        instance.gameObject.SetActive(false);
-	        instance.transform.parent = _parent.transform;
+	        var instance = Object.Instantiate(_objectToCopy, Vector3.zero, Quaternion.identity) as T;
+            OnHandleAllocatePrefab(instance);
 	        return instance;
 	    }
 
 	    #region herlper_methods
 	    private void BatchAllocatePoolItems(int count)
 	    {
-	        List<GameObject> availableItems = _availableInstances;
+	        List<T> availableItems = _availableInstances;
 	
 	        int allocationCount = AvailablePrefabCountMaximum - availableItems.Count;
 	        if (count < allocationCount)
@@ -148,7 +152,7 @@ namespace SimplePrefabPool
 	        }
 	    }
 
-	    private GameObject RetrieveLastItemAndRemoveIt()
+	    private T RetrieveLastItemAndRemoveIt()
 	    {
 	        int lastElementIndex = _availableInstances.Count - 1;
 	        var prefab = _availableInstances[lastElementIndex];

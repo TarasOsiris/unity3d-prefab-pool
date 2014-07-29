@@ -13,7 +13,7 @@ public class TestMyPool : MonoBehaviour
     public int maxPoolSize = int.MaxValue;
 
     private GameObject _poolClonesContainer;
-    private PrefabPool _cubesPool;
+    private GameObjectPool _cubesPool;
 
     private List<GameObject> _myInstantiatedCubes;
     void Awake()
@@ -25,7 +25,7 @@ public class TestMyPool : MonoBehaviour
     private void Start()
     {
         // Create pool of cubes containing instantiated cubePrefabs
-        _cubesPool = new PrefabPool(cubePrefab, _poolClonesContainer, initialPoolSize, growth, maxPoolSize);
+        _cubesPool = new GameObjectPool(cubePrefab, _poolClonesContainer, initialPoolSize, growth, maxPoolSize);
 
         StartCoroutine(ObtainPoolItems());
     }
