@@ -5,7 +5,7 @@ using Object = UnityEngine.Object;
 
 namespace SimplePrefabPool
 {
-	public abstract class PrefabPool : IPrefabPool
+	public class PrefabPool : IPrefabPool
 	{
 	    private readonly List<GameObject> _availableInstances;
 	    private readonly GameObject _prefab;
