@@ -37,7 +37,9 @@ public class TestMyPool : MonoBehaviour
         for (int i = 0; i < numberOfCubesRequired; i++)
         {
             // obtained item becomes active the moment you retrieve it
-            _myInstantiatedCubes.Add(_cubesPool.ObtainPrefabInstance());
+            var obtainedInstance = _cubesPool.ObtainPrefabInstance();
+            obtainedInstance.transform.position = new Vector3(i, i, i);
+            _myInstantiatedCubes.Add(obtainedInstance);
             yield return new WaitForSeconds(0.5f);
         }
 

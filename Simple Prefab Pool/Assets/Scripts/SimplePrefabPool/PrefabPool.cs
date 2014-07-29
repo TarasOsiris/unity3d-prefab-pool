@@ -5,7 +5,7 @@ using Object = UnityEngine.Object;
 
 namespace SimplePrefabPool
 {
-	public class PrefabPool : IPrefabPool
+	public abstract class PrefabPool : IPrefabPool
 	{
 	    private readonly List<GameObject> _availableInstances;
 	    private readonly GameObject _prefab;
@@ -97,7 +97,7 @@ namespace SimplePrefabPool
         /*
          * Every item passes this method before it is obtained from the pool
          */
-        private void OnHandleObtainPrefab(GameObject prefabInstance)
+        protected virtual void OnHandleObtainPrefab(GameObject prefabInstance)
         {
             prefabInstance.gameObject.SetActive(true);
         }
@@ -117,7 +117,7 @@ namespace SimplePrefabPool
 	    /*
 	     * Every item passes this method before it gets recycled
 	     */
-	    private void OnHandleRecyclePrefab(GameObject prefabInstance)
+	    protected virtual void OnHandleRecyclePrefab(GameObject prefabInstance)
 	    {
 	        PrefabPoolUtils.AddChild(_parent.gameObject, prefabInstance.gameObject);
 	        prefabInstance.gameObject.SetActive(false);
