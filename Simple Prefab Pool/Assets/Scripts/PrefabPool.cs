@@ -80,24 +80,13 @@ public class PrefabPool : IPrefabPool
 
     public void RecyclePrefabInstance(Transform prefab)
     {
-        if (prefab == null)
-        {
-            throw new ArgumentNullException("Cannot recycle null item!");
-        }
+        if (prefab == null) { throw new ArgumentNullException("Cannot recycle null item!"); }
 
         OnHandleRecyclePrefab(prefab);
-
-        if (_availablePrefabs.Count < AvailablePrefabCountMaximum)
-        {
-            _availablePrefabs.Add(prefab);
-        }
-
+        if (_availablePrefabs.Count < AvailablePrefabCountMaximum) { _availablePrefabs.Add(prefab); }
         UnrecycledPrefabCount--;
 
-        if (UnrecycledPrefabCount < 0)
-        {
-            Debug.Log("More items recycled than obtained");
-        }
+        if (UnrecycledPrefabCount < 0) { Debug.Log("More items recycled than obtained"); }
     }
 
     #endregion
