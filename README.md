@@ -1,4 +1,4 @@
-unity3d-prefab-pool
+Description outdated - will be updated soon ! unity3d-prefab-pool
 ===================
 
 Simple Prefab Pool for Unity3D
