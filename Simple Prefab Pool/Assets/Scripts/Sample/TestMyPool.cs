@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using SimplePrefabPool;
 using UnityEngine;
 
 public class TestMyPool : MonoBehaviour
@@ -26,8 +25,7 @@ public class TestMyPool : MonoBehaviour
     {
         // Create pool of cubes containing instantiated cubePrefabs
         _cubesPool = new MyCubePool(cubePrefab, _poolClonesContainer, initialPoolSize, growth, maxPoolSize);
-
-
+        
         StartCoroutine(ObtainPoolItems());
     }
 

@@ -1,6 +1,5 @@
 ﻿using SimplePrefabPool;
 using UnityEngine;
-using System.Collections;
 
 public class MyCubePool : AbstractPrefabPool<MyCube>
 {
@@ -20,6 +19,9 @@ public class MyCubePool : AbstractPrefabPool<MyCube>
     {
     }
 
+    /*
+     * Cube gets YELLOW when allocated
+     */
     protected override void OnHandleAllocatePrefab(MyCube prefabInstance)
     {
         prefabInstance.gameObject.SetActive(true);
@@ -27,12 +29,20 @@ public class MyCubePool : AbstractPrefabPool<MyCube>
         prefabInstance.transform.position = new Vector3(-3, -3, -3);
     }
 
+    /*
+     * Cube gets GREEN when obtained
+     */
     protected override void OnHandleObtainPrefab(MyCube prefabInstance)
     {
         prefabInstance.gameObject.SetActive(true);
         prefabInstance.renderer.material.color = Color.green;
     }
 
+    /*
+     * Cube gets RED when recycled
+     * 
+     * Intentionally left active to stay visible
+     */
     protected override void OnHandleRecyclePrefab(MyCube prefabInstance)
     {
         prefabInstance.gameObject.SetActive(true);
