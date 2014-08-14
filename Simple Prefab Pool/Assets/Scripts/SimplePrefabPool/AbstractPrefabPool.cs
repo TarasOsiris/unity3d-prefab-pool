@@ -10,8 +10,6 @@ namespace SimplePrefabPool
 	    private readonly List<T> _availableInstances;
 	    private readonly T _objectToCopy;
 	
-	    // parent GameObject for instantiated items
-	    private readonly GameObject _parent;
 	    private readonly int _growth;
 	
 	    public int UnrecycledPrefabCount { get; private set; }
@@ -52,7 +50,6 @@ namespace SimplePrefabPool
 	        }
 	
 	        _objectToCopy = objectToCopy;
-	        _parent = parent;
 	        _growth = growth;
 	        AvailablePrefabCountMaximum = availableItemsMaximum;
 	        _availableInstances = new List<T>(initialSize);
