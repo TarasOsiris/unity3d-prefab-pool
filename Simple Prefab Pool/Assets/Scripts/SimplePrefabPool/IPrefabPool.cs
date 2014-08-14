@@ -2,7 +2,7 @@
 
 namespace SimplePrefabPool
 {
-	public interface IPrefabPool
+	public interface IPrefabPool<T> where T : Object
 	{
 	    int UnrecycledPrefabCount { get; }
 	
@@ -10,8 +10,8 @@ namespace SimplePrefabPool
 	
 	    int AvailablePrefabCountMaximum { get; }
 	
-	    GameObject ObtainPrefabInstance();
+	    T ObtainPrefabInstance();
 	
-	    void RecyclePrefabInstance(GameObject prefab);
+	    void RecyclePrefabInstance(T prefab);
 	}
 }

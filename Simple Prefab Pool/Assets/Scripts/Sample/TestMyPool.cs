@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class TestMyPool : MonoBehaviour
 {
-    public GameObject cubePrefab;
+    public MyCube cubePrefab;
     public GameObject newParent;
 
     public int initialPoolSize = 15; // number of prefabs that will be instantiated when pool is created
@@ -13,19 +13,20 @@ public class TestMyPool : MonoBehaviour
     public int maxPoolSize = int.MaxValue;
 
     private GameObject _poolClonesContainer;
-    private PrefabPool _cubesPool;
+    private MyCubePool _cubesPool;
 
-    private List<GameObject> _myInstantiatedCubes;
+    private List<MyCube> _myInstantiatedCubes;
     void Awake()
     {
         _poolClonesContainer = GameObject.FindGameObjectWithTag("PoolHolder");
-        _myInstantiatedCubes = new List<GameObject>();
+        _myInstantiatedCubes = new List<MyCube>();
     }
 
     private void Start()
     {
         // Create pool of cubes containing instantiated cubePrefabs
-        _cubesPool = new PrefabPool(cubePrefab, _poolClonesContainer, initialPoolSize, growth, maxPoolSize);
+        _cubesPool = new MyCubePool(cubePrefab, _poolClonesContainer, initialPoolSize, growth, maxPoolSize);
+
 
         StartCoroutine(ObtainPoolItems());
     }
